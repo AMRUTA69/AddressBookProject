@@ -1,23 +1,31 @@
-import java.io.Serializable;
+public class Contact {
 
-public class Contact implements Serializable {
-    private static final long serialVersionUID = 1L;
     private String name;
-    private String phone;
+    private String phoneNumber;
 
-    public Contact(String name, String phone) {
+    public Contact(String name, String phoneNumber) {
         this.name = name;
-        this.phone = phone;
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getName() {
+        return name;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     @Override
     public String toString() {
-        return "Name: " + name + " | Phone: " + phone;
+        return name + " - " + phoneNumber;
     }
 }
-
