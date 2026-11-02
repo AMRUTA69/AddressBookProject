@@ -1,5 +1,4 @@
 public class Contact {
-
     private String name;
     private String phoneNumber;
 
@@ -24,6 +23,7 @@ public class Contact {
         this.phoneNumber = phoneNumber;
     }
 
+    // Ye method logging aur printing ke liye accha format return karta hai
     @Override
     public String toString() {
         return name + " - " + phoneNumber;

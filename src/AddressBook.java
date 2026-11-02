@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,114 +6,120 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class AddressBook {
 
-    // List to store all contacts
     private ArrayList<Contact> contactList;
     private static final String FILE_NAME = "contacts.txt";
+    
+    // Step 3: Comprehensive Logging setup
+    private static final Logger logger = Logger.getLogger(AddressBook.class.getName());
 
-    // Constructor
     public AddressBook() {
         contactList = new ArrayList<>();
     }
 
     // ---------- Add Contact ----------
     public void addContact(String name, String phone) {
-        Contact newContact = new Contact(name, phone);
-        contactList.add(newContact);
-        System.out.println("Contact added: " + name + " (" + phone + ")");
+        logger.info("Attempting to add contact: " + name + " | Phone: " + phone);
+        
+        // Step 2: Null-pointer check
+        if (name == null || name.trim().isEmpty() || phone == null || phone.trim().isEmpty()) {
+            logger.warning("Add contact failed: Name or Phone is empty.");
+         
+            return;
+        }
+
+        // Duplicate check
+        for (Contact c : contactList) {
+            if (c.getName().equalsIgnoreCase(name.trim())) {
+                logger.warning("Add contact failed: Contact with name '" + name + "' already exists.");
+                return;
+            }
+        }
+
+        contactList.add(new Contact(name.trim(), phone.trim()));
+        logger.info("Successfully added contact: " + name);
     }
 
     // ---------- View All Contacts ----------
     public void viewAllContacts() {
+        logger.info("Fetching all contacts...");
         if (contactList.isEmpty()) {
-            System.out.println("No contacts found.");
+            logger.warning("No contacts found.");
             return;
         }
-        System.out.println("\n--- All Contacts ---");
+        System.out.println("\n--- All Contacts (" + contactList.size() + ") ---");
         for (int i = 0; i < contactList.size(); i++) {
-            System.out.println((i + 1) + ". " + contactList.get(i).getName()
-                    + " - " + contactList.get(i).getPhoneNumber());
+            System.out.println((i + 1) + ". " + contactList.get(i));
         }
+        logger.info("Displayed " + contactList.size() + " contacts.");
     }
 
     // ---------- Delete Contact ----------
     public void deleteContact(String name) {
+        logger.info("Attempting to delete contact: " + name);
+        
+        if (name == null || name.trim().isEmpty()) {
+            logger.warning("Delete failed: Name is empty.");
+            return;
+        }
+
         boolean removed = false;
         for (int i = 0; i < contactList.size(); i++) {
-            if (contactList.get(i).getName().equalsIgnoreCase(name)) {
+            if (contactList.get(i).getName().equalsIgnoreCase(name.trim())) {
                 contactList.remove(i);
                 removed = true;
-                System.out.println("Contact deleted: " + name);
+                logger.info("Successfully deleted contact: " + name);
                 break;
             }
         }
         if (!removed) {
-            System.out.println("Contact not found: " + name);
+            logger.warning("Delete failed: Contact '" + name + "' not found.");
         }
     }
 
-    // ---------- Step 1: Save Contacts to File ----------
+    // ---------- Save Contacts to File ----------
     public void saveContacts() {
+        logger.info("Saving contacts to file: " + FILE_NAME);
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             for (Contact contact : contactList) {
                 writer.write(contact.getName() + "," + contact.getPhoneNumber());
                 writer.newLine();
             }
-            System.out.println("Contacts saved successfully to " + FILE_NAME);
+            logger.info("Successfully saved " + contactList.size() + " contacts.");
         } catch (IOException e) {
-            System.out.println("Error saving contacts: " + e.getMessage());
+            logger.severe("Error saving contacts: " + e.getMessage());
         }
     }
 
-    // ---------- Step 2 & 3: Load Contacts with Exception Handling ----------
+    // ---------- Load Contacts with Exception Handling ----------
     public void loadContacts() {
         File file = new File(FILE_NAME);
-
-        // If file doesn't exist, just start fresh (user-friendly)
         if (!file.exists()) {
-            System.out.println("No existing address book found. Starting a new one.");
+            logger.info("No existing address book file found. Starting fresh.");
             return;
         }
 
+        logger.info("Loading contacts from file: " + FILE_NAME);
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             int loadedCount = 0;
-            int skippedCount = 0;
-
             while ((line = reader.readLine()) != null) {
-                // Skip empty lines
-                if (line.trim().isEmpty()) {
-                    continue;
-                }
-
+                if (line.trim().isEmpty()) continue;
+                
                 String[] parts = line.split(",");
-
-                // Step 4: Handle corrupted lines gracefully
                 if (parts.length == 2) {
                     contactList.add(new Contact(parts[0].trim(), parts[1].trim()));
                     loadedCount++;
                 } else {
-                    System.out.println("Skipping corrupted line: " + line);
-                    skippedCount++;
+                    logger.warning("Skipping corrupted line: " + line);
                 }
             }
-
-            System.out.println("Loaded " + loadedCount + " contact(s) from file.");
-            if (skippedCount > 0) {
-                System.out.println("Skipped " + skippedCount + " corrupted line(s).");
-            }
-
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found. Starting fresh.");
+            logger.info("Successfully loaded " + loadedCount + " contacts from file.");
         } catch (IOException e) {
-            System.out.println("Error loading contacts: " + e.getMessage());
+            logger.severe("Error loading contacts: " + e.getMessage());
         }
-    }
-
-    // Helper method (optional)
-    public int getContactCount() {
-        return contactList.size();
     }
 }

@@ -7,7 +7,6 @@ public class Main {
         AddressBook addressBook = new AddressBook();
         Scanner scanner = new Scanner(System.in);
 
-        // ---------- Step 2: Load contacts at startup ----------
         System.out.println("=== Address Book Application ===");
         addressBook.loadContacts();
 
@@ -31,6 +30,7 @@ public class Main {
                     System.out.print("Enter phone number: ");
                     String phone = scanner.nextLine();
 
+                    // Null-pointer check pehle se hi Main mein hai
                     if (name.trim().isEmpty() || phone.trim().isEmpty()) {
                         System.out.println("Name and phone cannot be empty.");
                     } else {
@@ -53,7 +53,6 @@ public class Main {
                     break;
 
                 case "5":
-                    // Auto-save before exit
                     System.out.println("Saving contacts before exit...");
                     addressBook.saveContacts();
                     running = false;
